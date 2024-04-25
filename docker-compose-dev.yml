@@ -1,0 +1,36 @@
+version: "3"
+services:
+  api:
+    build: . #this is where the dockerfile is hosted
+    depends_on:
+      - postgres
+    ports: 
+      #- <port on local host>:<port on container>
+      - 8000:8000 # this means it will send the comand to the port 8000 on your server and it will route it to port 8000 inside the container.
+    volumes:
+      # <path on local>:<path on container>:ro (ro: read only that means only local can change those files, container cant change them)
+      - ./:/usr/src/app:ro
+    # env_file:
+    #   - ./.env
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - DATABASE_HOSTNAME=postgres # docker makes is easy to network between containers, see that here instead of local host i just put the name of the image 
+      - DATABASE_PORT=5432
+      - DATABASE_PASSWORD=admin
+      - DATABASE_NAME=fastapi
+      - DATABASE_USERNAME=postgres
+      - SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+  
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=fastapi
+    
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db:

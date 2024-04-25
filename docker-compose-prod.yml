@@ -1,0 +1,37 @@
+version: "3"
+services:
+  api:
+    #build: . #this is where the dockerfile is hosted #instead of building we use the image
+    image: j19z/fastapi
+    depends_on:
+      - postgres
+    ports: 
+      #- <port on local host>:<port on container>
+      - 80:8000 # this means it will send the comand to the port 80 on your server and it will route it to port 8000 inside the container.
+    # volumes: For Prod we dont need the volume becase we are not going to make any changes to our app like in Dev
+    #   # <path on local>:<path on container>:ro (ro: read only that means only local can change those files, container cant change them)
+    #   - ./:/usr/src/app:ro
+    # env_file:
+    #   - ./.env
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload # For Prod we dont need to reference this becaseu we already have it in out Dockerfile
+    environment:
+      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME} # docker makes is easy to network between containers, see that here instead of local host i just put the name of the image 
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+  
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+    
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db:

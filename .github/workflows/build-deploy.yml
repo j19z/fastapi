@@ -1,0 +1,21 @@
+name: Build and Deploy Code
+
+# on:
+#   push:
+#     branches: ["main", "another_branch"] # This way
+#       - "main" # Or this way
+#       - "another_branch"
+#   pull_request:
+#       branches:
+#         - "test_branch"
+
+on: [push, pull_request]
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: pulling git repo
+        uses: actions/checkout@v4
+      - name: say hi to Jose
+        run: echo "Hello Jose"
